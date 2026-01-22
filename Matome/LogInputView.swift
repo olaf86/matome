@@ -14,27 +14,25 @@ struct LogInputView: View {
     let onSave: (LogEntry) -> Void
     
     var body: some View {
-        NavigationView {
-            NavigationStack {
-                VStack {
-                    TextEditor(text: $text)
-                        .padding()
+        NavigationStack {
+            VStack {
+                TextEditor(text: $text)
+                    .padding()
+            }
+            .navigationTitle("New Log")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
-                .navigationTitle("New Log")
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Cancel") {
-                            dismiss()
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        let log = LogEntry(text: text, date: Date())
+                        onSave(log)
+                        dismiss()
                     }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Save") {
-                            let log = LogEntry(text: text, date: Date())
-                            onSave(log)
-                            dismiss()
-                        }
-                        .disabled(text.isEmpty)
-                    }
+                    .disabled(text.isEmpty)
                 }
             }
         }
