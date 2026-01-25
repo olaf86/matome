@@ -12,11 +12,7 @@ import _PhotosUI_SwiftUI
 import SwiftUI
 
 @MainActor
-final class SourceViewModel: ObservableObject {
-    
-    @Published var isGitHubConnected = false
-    private let gitHubService = GitHubService()
-    private let gitHubTokenKey = "github_token"
+final class MediaPermissionSectionViewModel: ObservableObject {
     
     @Published var mediaSelections: [PhotosPickerItem] = []
     @Published var assets: [PHAsset] = []
@@ -52,22 +48,6 @@ final class SourceViewModel: ObservableObject {
         default:
             return .secondary
         }
-    }
-    
-    init() {
-        isGitHubConnected = UserDefaults.standard.string(forKey: gitHubTokenKey) != nil
-    }
-    
-    func connectGitHub() {
-        gitHubService.login { token in
-            UserDefaults.standard.set(token, forKey: self.gitHubTokenKey)
-            self.isGitHubConnected = true
-        }
-    }
-    
-    func disconnectGitHub() {
-        UserDefaults.standard.removeObject(forKey: gitHubTokenKey)
-        isGitHubConnected = false
     }
     
     func saveMediaSelections() {
