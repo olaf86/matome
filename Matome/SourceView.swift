@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct SourceView: View {
 
@@ -44,7 +45,7 @@ struct SourceView: View {
                     .padding(.vertical, 4)
                 }
 
-                // MARK: - Action Section
+                // MARK: - GitHub Action Section
                 Section {
                     if vm.isGitHubConnected {
                         Button(role: .destructive) {
@@ -60,6 +61,24 @@ struct SourceView: View {
                             Label("Connect GitHub", systemImage: "link")
                         }
                     }
+                }
+                
+                Section("Photos") {
+                    PhotosPicker(
+                        selection: $vm.mediaSelections,
+                        photoLibrary: .shared()
+                    ) {
+                        Label("Select media", systemImage: "photo.on.rectangle.angled")
+                    }
+                    .padding()
+                    .onChange(of: vm.mediaSelections) {
+                        vm.saveMediaSelections()
+                    }
+                    
+                    AssetGridView(assets: vm.assets)
+                        .onChange(of: vm.assets, initial: true) {
+                            vm.loadMediaSelections()
+                        }
                 }
             }
             .navigationTitle("Source")
