@@ -63,22 +63,36 @@ struct SourceView: View {
                     }
                 }
                 
-                Section("Photos") {
-                    PhotosPicker(
-                        selection: $vm.mediaSelections,
-                        photoLibrary: .shared()
-                    ) {
-                        Label("Select media", systemImage: "photo.on.rectangle.angled")
+                // MARK: - Media Permission Section
+                Section("Media Permission") {
+                    Section("Media Access") {
+                        LabeledContent("Status") {
+                            Text(vm.statusText)
+                                .foregroundStyle(vm.statusColor)
+                        }
+                        Button("Change Permissions") {
+                            vm.handleChangePhotoLibraryPermissions()
+                        }
                     }
-                    .padding()
-                    .onChange(of: vm.mediaSelections) {
-                        vm.saveMediaSelections()
+                    .onAppear {
+                        vm.refreshPhotoLibraryAuthorizationStatus()
                     }
                     
-                    AssetGridView(assets: vm.assets)
-                        .onChange(of: vm.assets, initial: true) {
-                            vm.loadMediaSelections()
-                        }
+//                    PhotosPicker(
+//                        selection: $vm.mediaSelections,
+//                        photoLibrary: .shared()
+//                    ) {
+//                        Label("Select media", systemImage: "photo.on.rectangle.angled")
+//                    }
+//                    .padding()
+//                    .onChange(of: vm.mediaSelections) {
+//                        vm.saveMediaSelections()
+//                    }
+//                    
+//                    AssetGridView(assets: vm.assets)
+//                        .onChange(of: vm.assets, initial: true) {
+//                            vm.loadMediaSelections()
+//                        }
                 }
             }
             .navigationTitle("Source")
