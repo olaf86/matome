@@ -15,6 +15,7 @@ struct SourceView: View {
             Form {
                 GitHubSection()
                 MediaPermissionSection()
+                HealthPermissionSection()
             }
             .navigationTitle("Source")
         }
