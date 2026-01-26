@@ -10,38 +10,11 @@ import HealthKit
 import UIKit
 import SwiftUI
 
-struct HealthPermission: Identifiable {
-    let id = UUID()
-    let type: HKObjectType
-    let status: HKAuthorizationStatus
-}
-
-extension HKAuthorizationStatus {
-    var text: String {
-        switch self {
-        case .notDetermined: return "Not Determined"
-        case .sharingDenied: return "Denied"
-        case .sharingAuthorized: return "Allowed"
-        @unknown default: return "Unknown"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .sharingAuthorized: return .green
-        case .sharingDenied: return .red
-        case .notDetermined: return .gray
-        @unknown default: return .gray
-        }
-    }
-}
-
 @MainActor
 final class HealthPermissionSectionViewModel: ObservableObject {
     
     @Published var steps: Int? = nil
     @Published var isAuthorized: Bool = false
-    @Published var permissions: [HealthPermission] = []
     
     private let store = HKHealthStore()
     private var readTypes: Set<HKObjectType> {
@@ -54,7 +27,6 @@ final class HealthPermissionSectionViewModel: ObservableObject {
     
     init() {
         refreshIsAuthorized()
-        loadPermissions()
     }
     
     func changePermissions() {
@@ -70,7 +42,6 @@ final class HealthPermissionSectionViewModel: ObservableObject {
                         if success {
                             Task {
                                 await self.refreshIsAuthorized()
-                                await self.loadPermissions()
                             }
                         }
                     }
@@ -93,20 +64,6 @@ final class HealthPermissionSectionViewModel: ObservableObject {
                     self.steps = steps
                 }
             }
-        }
-    }
-    
-    func loadPermissions() {
-        let types = [
-            HKObjectType.quantityType(forIdentifier: .stepCount)!,
-            HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
-        ]
-        
-        permissions = types.map {
-            HealthPermission(
-                type: $0,
-                status: store.authorizationStatus(for: $0)
-            )
         }
     }
     

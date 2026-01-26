@@ -18,15 +18,6 @@ struct HealthPermissionSection: View {
                 Text(vm.isAuthorized ? "Authorized" : "Not Authorized")
                     .foregroundStyle(vm.isAuthorized ? .green : .red)
             }
-            
-            ForEach(vm.permissions) { permission in
-                HStack {
-                    Text(permission.type.description)
-                    Spacer()
-                    Text(permission.status.text)
-                        .foregroundStyle(permission.status.color)
-                }
-            }
 
             Button("Change Permissions") {
                 vm.changePermissions()
