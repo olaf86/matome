@@ -11,7 +11,8 @@ struct LogView: View {
     
     @State private var logs: [LogEntry] = []
     @State private var message: String = ""
-    @FocusState private var isInputFocused: Bool
+    @State private var isPresentingNewEntry: Bool = false
+    @State private var draftMessage: String = ""
 
     var body: some View {
         NavigationStack {
@@ -25,47 +26,50 @@ struct LogView: View {
                 .padding(.vertical)
             }
             .navigationTitle("My Logs")
-            .safeAreaInset(edge: .bottom) {
-                HStack(spacing: 8) {
-                    ZStack(alignment: .topLeading) {
-                        if message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            Text("メッセージを入力")
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 10)
-                        }
-                        TextEditor(text: $message)
-                            .focused($isInputFocused)
-                            .lineLimit(2...5)
-                            .frame(minHeight: 36, maxHeight: 80)
-                            .padding(.horizontal, 8)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        draftMessage = ""
+                        isPresentingNewEntry = true
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .accessibilityLabel("New Message")
+                }
+            }
+            .sheet(isPresented: $isPresentingNewEntry) {
+                NavigationStack {
+                    VStack(spacing: 0) {
+                        TextEditor(text: $draftMessage)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
                             .scrollContentBackground(.hidden)
                             .background(Color.clear)
                     }
-
-                    Button(action: {
-                        sendMessage()
-                        isInputFocused = false
-                    }) {
-                        Image(systemName: "paperplane")
-                            .foregroundStyle(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .secondary : .primary)
+                    .navigationTitle("New Message")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                isPresentingNewEntry = false
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Save") {
+                                let trimmed = draftMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+                                guard !trimmed.isEmpty else { return }
+                                let newLog = LogEntry(text: trimmed, date: Date())
+                                logs.append(newLog)
+                                isPresentingNewEntry = false
+                            }
+                            .disabled(draftMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
                     }
-                    .disabled(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 4)
-                .background(.ultraThinMaterial)
+                .presentationDetents([.medium, .large])
             }
         }
-    }
-
-    private func sendMessage() {
-        let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        let newLog = LogEntry(text: trimmed, date: Date())
-        logs.append(newLog)
-        message = ""
-        isInputFocused = false
     }
 }
 
