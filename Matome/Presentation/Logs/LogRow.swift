@@ -12,13 +12,27 @@ struct LogRow: View {
     let log: LogEntry
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
+            // Chat bubble
             Text(log.text)
-                .font(.headline)
+                .foregroundColor(.primary)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(.secondarySystemBackground))
+                )
+
+            // Date under the bubble
             Text(log.date.formatted())
-                .font(.caption)
+                .font(.caption2)
                 .foregroundColor(.secondary)
+                .padding(.leading, 4)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
     }
+}
+
+#Preview {
+    LogRow(log: .init(text: "Hello, world!", date: Date()))
 }
