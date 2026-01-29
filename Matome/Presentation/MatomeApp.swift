@@ -10,8 +10,11 @@ import SwiftData
 
 @main
 struct MatomeApp: App {
+    
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([])
+        let schema = Schema([
+            LogEntry.self
+        ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
