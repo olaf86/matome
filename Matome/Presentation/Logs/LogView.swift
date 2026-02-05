@@ -39,36 +39,15 @@ struct LogView: View {
                 }
             }
             .sheet(isPresented: $isPresentingNewEntry) {
-                NavigationStack {
-                    VStack(spacing: 0) {
-                        TextEditor(text: $draftMessage)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .scrollContentBackground(.hidden)
-                            .background(Color.clear)
-                    }
-                    .navigationTitle("New Message")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                isPresentingNewEntry = false
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Save") {
-                                let trimmed = draftMessage.trimmingCharacters(in: .whitespacesAndNewlines)
-                                guard !trimmed.isEmpty else { return }
-                                let newLog = LogEntry(text: trimmed, date: Date())
-                                logs.append(newLog)
-                                isPresentingNewEntry = false
-                            }
-                            .disabled(draftMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        }
-                    }
+                NewLogEntrySheetView(
+                    isPresented: $isPresentingNewEntry,
+                    draftMessage: $draftMessage
+                ) { text in
+                    let newLog = LogEntry(text: text, date: Date())
+                    logs.append(newLog)
                 }
-                .presentationDetents([.medium, .large])
             }
+            .presentationDetents([.medium, .large])
         }
     }
 }
@@ -76,3 +55,4 @@ struct LogView: View {
 #Preview("LogView") {
     LogView()
 }
+
