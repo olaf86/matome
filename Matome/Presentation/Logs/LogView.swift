@@ -16,6 +16,7 @@ struct LogView: View {
     @State private var draftMessage: String = ""
     @State private var calendarDate: Date = Date()
     @State private var needsScrollToLatest: Bool = false
+    @State private var isCalendarPresented: Bool = false
 #if DEBUG
     @State private var isSeedingSamples: Bool = false
 #endif
@@ -63,9 +64,21 @@ struct LogView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
-                        DatePicker("Jump Date", selection: $calendarDate, displayedComponents: [.date])
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
+                        Button {
+                            isCalendarPresented = true
+                        } label: {
+                            Image(systemName: "calendar")
+                        }
+                        .accessibilityLabel("Jump Date")
+                        .popover(isPresented: $isCalendarPresented) {
+                            DatePicker("Jump Date", selection: $calendarDate, displayedComponents: [.date])
+                                .datePickerStyle(.graphical)
+                                .labelsHidden()
+                                .padding(8)
+                                .frame(width: 320)
+                                .presentationDetents([.height(340)])
+                                .presentationCompactAdaptation(.popover)
+                        }
                     }
 #if DEBUG
                     ToolbarItem(placement: .topBarTrailing) {
