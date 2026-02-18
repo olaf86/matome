@@ -50,6 +50,9 @@ struct LogView: View {
                         scrollToLatest(proxy: proxy)
                     }
                 }
+                .onChange(of: calendarDate) { _, newValue in
+                    jumpToDate(newValue, proxy: proxy)
+                }
                 .onChange(of: needsScrollToLatest) { _, newValue in
                     guard newValue else { return }
                     scrollToLatest(proxy: proxy)
@@ -58,12 +61,8 @@ struct LogView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         DatePicker("Jump Date", selection: $calendarDate, displayedComponents: [.date])
+                            .datePickerStyle(.compact)
                             .labelsHidden()
-                    }
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Jump") {
-                            jumpToDate(calendarDate, proxy: proxy)
-                        }
                     }
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -118,6 +117,7 @@ struct LogView: View {
         }
     }
 }
+
 
 #Preview("LogView") {
     LogView()
