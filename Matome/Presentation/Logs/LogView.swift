@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LogView: View {
     
-    @State private var logs: [LogEntry] = []
-    @State private var message: String = ""
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \LogEntry.date) private var logs: [LogEntry]
     @State private var isPresentingNewEntry: Bool = false
     @State private var draftMessage: String = ""
 
@@ -44,7 +45,12 @@ struct LogView: View {
                     draftMessage: $draftMessage
                 ) { text in
                     let newLog = LogEntry(text: text, date: Date())
-                    logs.append(newLog)
+                    modelContext.insert(newLog)
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        assertionFailure("Failed to save LogEntry: \(error)")
+                    }
                 }
             }
             .presentationDetents([.medium, .large])
@@ -55,4 +61,3 @@ struct LogView: View {
 #Preview("LogView") {
     LogView()
 }
-
