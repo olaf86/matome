@@ -16,6 +16,9 @@ struct LogView: View {
     @State private var draftMessage: String = ""
     @State private var calendarDate: Date = Date()
     @State private var needsScrollToLatest: Bool = false
+#if DEBUG
+    @State private var isSeedingSamples: Bool = false
+#endif
 
     var body: some View {
         NavigationStack {
@@ -64,6 +67,15 @@ struct LogView: View {
                             .datePickerStyle(.compact)
                             .labelsHidden()
                     }
+#if DEBUG
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Seed") {
+                            seedSampleLogs()
+                        }
+                        .disabled(isSeedingSamples)
+                        .accessibilityLabel("Seed Sample Logs")
+                    }
+#endif
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             draftMessage = ""
@@ -116,6 +128,37 @@ struct LogView: View {
             proxy.scrollTo(latestID, anchor: .bottom)
         }
     }
+
+#if DEBUG
+    private func seedSampleLogs() {
+        guard !isSeedingSamples else { return }
+        isSeedingSamples = true
+
+        let calendar = Calendar.current
+        let baseDate = Date()
+        let days = 30
+        let logsPerDay = 5
+
+        for dayOffset in 0..<days {
+            for logIndex in 0..<logsPerDay {
+                guard let day = calendar.date(byAdding: .day, value: -dayOffset, to: baseDate) else { continue }
+                guard let date = calendar.date(byAdding: .minute, value: -logIndex, to: day) else { continue }
+                let log = LogEntry(text: "Sample \(dayOffset)-\(logIndex)", date: date)
+                modelContext.insert(log)
+            }
+        }
+
+        do {
+            try modelContext.save()
+            viewModel.loadInitial(context: modelContext)
+            needsScrollToLatest = true
+        } catch {
+            assertionFailure("Failed to seed sample logs: \(error)")
+        }
+
+        isSeedingSamples = false
+    }
+#endif
 }
 
 

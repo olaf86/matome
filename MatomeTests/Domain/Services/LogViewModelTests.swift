@@ -15,6 +15,7 @@ struct LogViewModelTests {
     }
 
     @Test("Load logs in pages of 10")
+    @MainActor
     func loadPagedLogs() throws {
         let context = try makeInMemoryContext()
         let baseDate = Date(timeIntervalSince1970: 1_700_000_000)
