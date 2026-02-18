@@ -21,6 +21,11 @@ struct ContentView: View {
                     Image(systemName: "list.bullet")
                     Text("Log")
                 }
+            ReportView()
+                .tabItem {
+                    Image(systemName: "flag")
+                    Text("Report")
+                }
         }
     }
 }
