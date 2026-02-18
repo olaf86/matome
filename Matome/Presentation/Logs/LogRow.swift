@@ -24,7 +24,7 @@ struct LogRow: View {
                 )
 
             // Date under the bubble
-            Text(log.date.formatted())
+            Text(log.date.formatted(date: .omitted, time: .shortened))
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .padding(.leading, 4)
