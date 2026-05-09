@@ -6,41 +6,44 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct MediaPermissionSection: View {
-    
+
     @StateObject private var vm = MediaPermissionSectionViewModel()
-    
+
+    private var hasAccess: Bool {
+        vm.photoLibraryAuthorizationStatus == .authorized || vm.photoLibraryAuthorizationStatus == .limited
+    }
+
     var body: some View {
-        Section("Media Permission") {
-            Section("Media Access") {
-                LabeledContent("Status") {
-                    Text(vm.statusText)
-                        .foregroundStyle(vm.statusColor)
+        Section("Media") {
+            LabeledContent("Status") {
+                Text(vm.statusText)
+                    .foregroundStyle(vm.statusColor)
+            }
+            Button("Change Permissions") {
+                vm.handleChangePhotoLibraryPermissions()
+            }
+            if hasAccess {
+                PhotosPicker(
+                    selection: $vm.mediaSelections,
+                    photoLibrary: .shared()
+                ) {
+                    Label("Select media", systemImage: "photo.on.rectangle.angled")
                 }
-                Button("Change Permissions") {
-                    vm.handleChangePhotoLibraryPermissions()
+                .onChange(of: vm.mediaSelections) {
+                    vm.saveMediaSelections()
+                }
+                if !vm.assets.isEmpty {
+                    AssetGridView(assets: vm.assets)
+                        .frame(height: 220)
                 }
             }
-            .onAppear {
-                vm.refreshPhotoLibraryAuthorizationStatus()
-            }
-            
-//                    PhotosPicker(
-//                        selection: $vm.mediaSelections,
-//                        photoLibrary: .shared()
-//                    ) {
-//                        Label("Select media", systemImage: "photo.on.rectangle.angled")
-//                    }
-//                    .padding()
-//                    .onChange(of: vm.mediaSelections) {
-//                        vm.saveMediaSelections()
-//                    }
-//
-//                    AssetGridView(assets: vm.assets)
-//                        .onChange(of: vm.assets, initial: true) {
-//                            vm.loadMediaSelections()
-//                        }
+        }
+        .onAppear {
+            vm.refreshPhotoLibraryAuthorizationStatus()
+            vm.loadMediaSelections()
         }
     }
 }
