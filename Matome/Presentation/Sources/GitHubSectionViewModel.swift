@@ -10,24 +10,24 @@ import Combine
 
 @MainActor
 final class GitHubSectionViewModel: ObservableObject {
-    
+
     @Published var isGitHubConnected = false
     private let gitHubService = GitHubService()
     private let gitHubTokenKey = "github_token"
-    
+
     init() {
-        isGitHubConnected = UserDefaults.standard.string(forKey: gitHubTokenKey) != nil
+        isGitHubConnected = KeychainHelper.load(forKey: gitHubTokenKey) != nil
     }
-    
+
     func connectGitHub() {
         gitHubService.login { token in
-            UserDefaults.standard.set(token, forKey: self.gitHubTokenKey)
+            KeychainHelper.save(token, forKey: self.gitHubTokenKey)
             self.isGitHubConnected = true
         }
     }
-    
+
     func disconnectGitHub() {
-        UserDefaults.standard.removeObject(forKey: gitHubTokenKey)
+        KeychainHelper.delete(forKey: gitHubTokenKey)
         isGitHubConnected = false
     }
 }

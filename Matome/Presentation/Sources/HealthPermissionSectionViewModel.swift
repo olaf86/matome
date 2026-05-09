@@ -68,7 +68,16 @@ final class HealthPermissionSectionViewModel: ObservableObject {
     }
     
     private func refreshIsAuthorized() {
-        isAuthorized = HKHealthStore.isHealthDataAvailable()
+        guard HKHealthStore.isHealthDataAvailable() else {
+            isAuthorized = false
+            return
+        }
+        store.getRequestStatusForAuthorization(toShare: [], read: readTypes) { [weak self] status, _ in
+            DispatchQueue.main.async {
+                // .unnecessary means the system won't show a prompt — authorization was already handled
+                self?.isAuthorized = (status == .unnecessary)
+            }
+        }
     }
     
     private func fetchTodaySteps(completion: @escaping (Int) -> Void) {
