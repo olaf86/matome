@@ -7,8 +7,12 @@
 
 import Combine
 import HealthKit
-import UIKit
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 @MainActor
 final class HealthPermissionSectionViewModel: ObservableObject {
@@ -111,8 +115,14 @@ final class HealthPermissionSectionViewModel: ObservableObject {
     }
     
     private func openAppSettings() {
+#if canImport(UIKit)
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
+#elseif canImport(AppKit)
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Health") {
+            NSWorkspace.shared.open(url)
+        }
+#endif
     }
 }
 
