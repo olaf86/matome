@@ -63,7 +63,7 @@ struct LogView: View {
                     needsScrollToLatest = false
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
+                    ToolbarItem(placement: .navigation) {
                         Button {
                             isCalendarPresented = true
                         } label: {
@@ -81,7 +81,7 @@ struct LogView: View {
                         }
                     }
 #if DEBUG
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .primaryAction) {
                         Button("Seed") {
                             seedSampleLogs()
                         }
@@ -89,7 +89,7 @@ struct LogView: View {
                         .accessibilityLabel("Seed Sample Logs")
                     }
 #endif
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .primaryAction) {
                         Button {
                             draftMessage = ""
                             isPresentingNewEntry = true
@@ -101,7 +101,7 @@ struct LogView: View {
                 }
             }
             .navigationTitle("My Logs")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .sheet(isPresented: $isPresentingNewEntry) {
                 NewLogEntrySheetView(
                     isPresented: $isPresentingNewEntry,

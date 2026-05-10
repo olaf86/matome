@@ -35,7 +35,7 @@ struct ReportGenerateView: View {
                             .padding(8)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(.secondarySystemBackground))
+                                    .fill(Color.secondaryBackground)
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -59,9 +59,9 @@ struct ReportGenerateView: View {
                 .padding()
             }
             .navigationTitle("Generate")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Button("Done") { dismiss() }
                 }
             }
@@ -108,7 +108,7 @@ private struct UnavailableBanner: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color.secondaryBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -154,7 +154,7 @@ private struct IncludedSourcesSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color.secondaryBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)

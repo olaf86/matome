@@ -20,7 +20,7 @@ struct LogRow: View {
                 .padding(.horizontal, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color(.secondarySystemBackground))
+                        .fill(Color.secondaryBackground)
                 )
 
             // Date under the bubble
