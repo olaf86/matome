@@ -7,6 +7,7 @@ struct ReportGenerateView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var generatedSummary: String = ""
     @State private var isGenerating: Bool = false
+    @State private var isModelAvailable: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -18,6 +19,10 @@ struct ReportGenerateView: View {
                         Text("Range: \(range.title)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                    }
+
+                    if !isModelAvailable {
+                        UnavailableBanner()
                     }
 
                     IncludedSourcesSection(items: items)
@@ -42,16 +47,14 @@ struct ReportGenerateView: View {
                         generateSummary()
                     } label: {
                         HStack {
-                            if isGenerating {
-                                ProgressView()
-                            }
+                            if isGenerating { ProgressView() }
                             Text(isGenerating ? "Generating..." : "Generate Summary")
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(isGenerating)
+                    .disabled(isGenerating || !isModelAvailable)
                 }
                 .padding()
             }
@@ -59,33 +62,58 @@ struct ReportGenerateView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
+                    Button("Done") { dismiss() }
                 }
             }
             .onAppear {
-                if generatedSummary.isEmpty {
-                    generatedSummary = placeholderSummary
+                if #available(iOS 26.0, *) {
+                    isModelAvailable = SummaryGeneratorService.isAvailable
                 }
             }
         }
     }
 
-    private var placeholderSummary: String {
-        let sources = ReportDataSource.allCases
-            .filter { source in items.contains { $0.source == source } }
-            .map { "- \($0.title)" }
-            .joined(separator: "\n")
-        return "# Summary\n\n## Included sources\n\n\(sources)\n\n## Highlights\n\n- \n- \n"
-    }
-
     private func generateSummary() {
+        guard #available(iOS 26.0, *) else { return }
         isGenerating = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            generatedSummary = placeholderSummary
+        generatedSummary = ""
+        Task {
+            do {
+                let service = SummaryGeneratorService()
+                for try await accumulated in service.stream(items: items, range: range) {
+                    generatedSummary = accumulated
+                }
+            } catch {
+                generatedSummary = "_Generation failed: \(error.localizedDescription)_"
+            }
             isGenerating = false
         }
+    }
+}
+
+private struct UnavailableBanner: View {
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "apple.intelligence")
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Apple Intelligence required")
+                    .font(.subheadline.weight(.semibold))
+                Text("Available on iPhone 15 Pro or later with Apple Intelligence enabled.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.secondarySystemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(.quaternary, lineWidth: 1)
+        )
     }
 }
 

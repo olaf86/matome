@@ -14,6 +14,19 @@ public enum ReportRange: String, CaseIterable, Identifiable {
         case .year: return "Year"
         }
     }
+
+    public var dateInterval: (start: Date, end: Date) {
+        let now = Date()
+        let calendar = Calendar.current
+        let start: Date
+        switch self {
+        case .day:   start = calendar.startOfDay(for: now)
+        case .week:  start = calendar.date(byAdding: .day,   value: -7,  to: now)!
+        case .month: start = calendar.date(byAdding: .month, value: -1,  to: now)!
+        case .year:  start = calendar.date(byAdding: .year,  value: -1,  to: now)!
+        }
+        return (start, now)
+    }
 }
 
 public enum ReportDataSource: String, CaseIterable, Identifiable {

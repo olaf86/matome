@@ -6,17 +6,18 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ReportView: View {
 
     @StateObject private var viewModel = ReportViewModel()
     @State private var isPresentingGenerate: Bool = false
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Range selector
                     Picker("Range", selection: $viewModel.selectedRange) {
                         ForEach(ReportRange.allCases, id: \.self) { range in
                             Text(range.title).tag(range)
@@ -24,20 +25,20 @@ struct ReportView: View {
                     }
                     .pickerStyle(.segmented)
 
-                    // Summary metrics
-                    SummarySection(metrics: viewModel.metrics)
-
-                    // Data sources used for summary generation
-                    DataSourcesSection(items: viewModel.dataItems)
-
-                    // Chart placeholder
-                    ChartPlaceholder()
-                        .frame(height: 220)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(.quaternary, lineWidth: 1)
-                        )
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, minHeight: 60)
+                    } else {
+                        SummarySection(metrics: viewModel.metrics)
+                        DataSourcesSection(items: viewModel.dataItems)
+                        ChartPlaceholder()
+                            .frame(height: 220)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(.quaternary, lineWidth: 1)
+                            )
+                    }
                 }
                 .padding()
             }
@@ -48,6 +49,7 @@ struct ReportView: View {
                         isPresentingGenerate = true
                     }
                     .accessibilityLabel("Generate Summary")
+                    .disabled(viewModel.isLoading)
                 }
             }
             .sheet(isPresented: $isPresentingGenerate) {
@@ -55,6 +57,12 @@ struct ReportView: View {
                     range: viewModel.selectedRange,
                     items: viewModel.dataItems
                 )
+            }
+            .onAppear {
+                viewModel.load(context: modelContext)
+            }
+            .onChange(of: viewModel.selectedRange) {
+                viewModel.load(context: modelContext)
             }
         }
     }
