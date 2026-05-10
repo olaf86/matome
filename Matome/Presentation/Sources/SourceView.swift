@@ -18,7 +18,7 @@ struct SourceView: View {
                 HealthPermissionSection()
             }
             .navigationTitle("Source")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
         }
     }
 }

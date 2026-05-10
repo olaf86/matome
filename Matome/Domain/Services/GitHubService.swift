@@ -67,32 +67,32 @@ final class GitHubService: NSObject {
 }
 
 extension GitHubService: ASWebAuthenticationPresentationContextProviding {
-    
+
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        // Prefer an existing key window's presentation anchor
+#if canImport(UIKit)
         if let anchor = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
             .first(where: { $0.isKeyWindow }) {
             return anchor
         }
-        
-        // Fall back to the first available window in any scene
         if let anyWindow = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
             .first {
             return anyWindow
         }
-        
-        // As a last resort, create a temporary window with a valid windowScene
         if let scene = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first {
-                let tempWindow = UIWindow(windowScene: scene)
-                return tempWindow
-            }
-        
+            let tempWindow = UIWindow(windowScene: scene)
+            return tempWindow
+        }
         fatalError("No windows in the application")
+#elseif canImport(AppKit)
+        if let window = NSApplication.shared.keyWindow { return window }
+        if let window = NSApplication.shared.windows.first { return window }
+        fatalError("No windows in the application")
+#endif
     }
 }

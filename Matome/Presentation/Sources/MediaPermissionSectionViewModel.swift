@@ -8,8 +8,13 @@
 import Foundation
 import Combine
 import Photos
-import _PhotosUI_SwiftUI
+import PhotosUI
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 @MainActor
 final class MediaPermissionSectionViewModel: ObservableObject {
@@ -94,17 +99,25 @@ final class MediaPermissionSectionViewModel: ObservableObject {
     }
     
     private func presentLimitedPicker() {
+#if canImport(UIKit)
         guard
             let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
             let rootVC = scene.windows.first?.rootViewController
         else { return }
-
         PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: rootVC)
+#endif
+        // macOS uses full-access model; limited picker concept does not apply
     }
-    
+
     private func openAppSettings() {
+#if canImport(UIKit)
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
+#elseif canImport(AppKit)
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Photos") {
+            NSWorkspace.shared.open(url)
+        }
+#endif
     }
 }
 

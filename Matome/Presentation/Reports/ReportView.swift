@@ -44,7 +44,7 @@ struct ReportView: View {
             }
             .navigationTitle("Report")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Button("Generate") {
                         isPresentingGenerate = true
                     }
@@ -137,7 +137,7 @@ private struct DataSourceBlock: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color.secondaryBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -187,7 +187,7 @@ private struct MetricCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
+                .fill(Color.secondaryBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -209,7 +209,7 @@ private struct ChartPlaceholder: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .background(Color(.secondarySystemBackground))
+        .background(Color.secondaryBackground)
     }
 }
 

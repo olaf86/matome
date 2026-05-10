@@ -16,7 +16,7 @@ struct NewLogEntrySheetView: View {
                     .background(Color.clear)
             }
             .navigationTitle("New Message")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
